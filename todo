@@ -1,0 +1,63 @@
+-- DECEMBER 5 2024 --
+
+card value enum 2-10 A Q J K
+card suit enum
+
+card class implements card interface
+- samecard
+- getval
+- getsuit
+
+gamechip enum (RED GREEN BLUE NONE)
+
+gamecell implements cell interface
+- getcard
+- field: card
+- haschip (!= NONE)
+- getchip
+- setchip
+- overload constructor for copying
+
+board class implements board interface
+- getcell
+- final field gamecell[][]
+- getstandardboard
+
+board implementation is default board (standardize the setup)
+customboard implementation allows custom setup
+
+location
+- public x,y (origin is topleft inclusive)
+
+things the model should be able to do
+- getcurrentturn (cyclic turn order)
+- handle 2,3,4,6,8,9 players
+- hold a decktodraw
+- hold a list of played cards (for card counting)
+- there is a standard deck that it builds itself, two of each card
+- numoneeyedjacks remaining
+- numtwoeyedjacks remaining
+- isgameover
+- getwinner
+- sequencemade? (after each move)
+- playmove (card, location)
+- setupgame (board, players, shuffler)
+- startgame asks first controller for a move
+- reshuffle
+
+controller interface
+- receivemove
+- choosemove
+- has a human or algorithm
+
+player interface
+- choosemove
+- receivemove (effectively blank for algorithm)
+
+human
+- respond to view input
+
+algorithm
+- receive the game state and make a decision
+
+make some javadoc
