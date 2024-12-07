@@ -4,8 +4,28 @@ import game.enums.GameChip;
 
 public interface GameBoard {
 
-  Cell getCell(GamePosition location);
+  /**
+   * Gets a copy of the cell at the provided location.
+   * @param location the 0-based location on the board (see GamePosition)
+   * @return a copy of the cell at the provided location
+   * @throws IllegalArgumentException if the location is invalid
+   */
+  Cell getCell(GamePosition location) throws IllegalArgumentException;
 
-  void setChip(GamePosition location, GameChip toSet);
+  /**
+   * Sets the chip at the requested location to the requested chip if possible.
+   * Note that boards do not care about game logic and will allow all chip setting
+   * (even when cells are already "taken" by players)
+   * @param location the location to set
+   * @param toSet the chip to set it to
+   * @throws IllegalArgumentException if the location is invalid
+   */
+  void setChip(GamePosition location, GameChip toSet) throws IllegalArgumentException;
+
+  /**
+   * Creates a copy of the current board and returns it.
+   * @return a copy of the stored board
+   */
+  Cell[][] getBoard();
 
 }

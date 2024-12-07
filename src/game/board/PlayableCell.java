@@ -13,6 +13,21 @@ public class PlayableCell implements Cell {
   private final Card card;
   private GameChip chip;
 
+  /**
+   * Creates a PlayableCell with no chip and the provided card.
+   * @param card the card to associate with this cell
+   */
+  public PlayableCell(Card card) {
+    this.card = Objects.requireNonNull(card);
+    this.chip = GameChip.NONE;
+  }
+
+  /**
+   * Creates a PlayableCell with the provided chip and card.
+   * Effectively useful in copying
+   * @param card the card to be stored
+   * @param chip the chip to be stored
+   */
   public PlayableCell(Card card, GameChip chip) {
     this.card = Objects.requireNonNull(card);
     this.chip = chip;

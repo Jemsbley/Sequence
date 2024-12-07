@@ -15,13 +15,13 @@ public interface Card {
    * Accesses the value of a given card.
    * @return the value of the card
    */
-  CardValue getValue();
+  CardValue value();
 
   /**
    * Accesses the suit of a given card.
    * @return the suit of the card
    */
-  CardSuit getSuit();
+  CardSuit suit();
 
   /**
    * Determines if this card is the same card as a given card either extensively or intensively.
