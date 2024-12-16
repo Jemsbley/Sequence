@@ -2,6 +2,10 @@ package game.board;
 
 import game.enums.GameChip;
 
+/**
+ * Behaviors of a board in the game of sequence. A board has a rectangular grid of cells
+ * that represent cards that can be played to
+ */
 public interface GameBoard {
 
   /**

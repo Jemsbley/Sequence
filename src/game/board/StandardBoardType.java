@@ -7,6 +7,10 @@ import game.enums.CardSuit;
 import game.enums.CardValue;
 import game.enums.GameChip;
 
+/**
+ * Implementation of the standard board in a game of sequence. Allows setting and changing
+ * of cells as would happen in games
+ */
 public class StandardBoardType implements GameBoard {
 
   private final Cell[][] board;
