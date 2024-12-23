@@ -12,6 +12,7 @@ import game.board.BasicCard;
 import game.board.Card;
 import game.board.GameBoard;
 import game.board.GameHand;
+import game.board.GamePosition;
 import game.board.SequenceHand;
 import game.controller.GameMove;
 import game.controller.SequenceController;
@@ -32,7 +33,37 @@ public class SequenceModel implements PlayableSequenceModel {
 
   @Override
   public void playToCell(GameMove move) {
-    // make this one
+    GamePosition where = move.location();
+    int which = move.handIndex();
+    GameHand playFrom = this.hands.get(this.currentPlayer);
+
+    if (which < 0 || which > playFrom.size() - 1) {
+      throw new IllegalArgumentException("Invalid hand index for move");
+    }
+
+    Card toPlay = playFrom.getCardAt(which);
+
+    if (this.board.getCell(where).hasChip()) {
+      if (toPlay.value().equals(CardValue.ONE_EYED_JACK)) {
+        this.board.setChip(where, GameChip.NONE);
+        this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
+      } else {
+        throw new IllegalArgumentException("Cannot play to already filled position");
+      }
+    } else {
+      this.board.setChip(where, this.currentPlayer.getTeam());
+      this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
+    }
+    if (this.deck.size() == 0) {
+      // make a discard deck that clears here into the actual deck
+    }
+    this.hands.get(this.currentPlayer).addCard(this.deck.remove(0));
+
+    this.currentPlayer = this.turnOrder.get(this.currentPlayer);
+    if (!this.isGameOver()) {
+
+      this.currentPlayer.beginTurn(this);
+    }
   }
 
   @Override
