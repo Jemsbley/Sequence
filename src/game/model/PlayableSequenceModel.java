@@ -36,4 +36,10 @@ public interface PlayableSequenceModel extends ReadOnlySequenceModel {
    */
   void beginPlaying();
 
+  /**
+   * Resets the current deck by reshuffling and ensuring that none of the cards currently in the
+   * players' hands are in the new deck (Effectively the same as reshuffling the discard pile).
+   */
+  void resetDeck();
+
 }

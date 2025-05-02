@@ -51,17 +51,25 @@ public class SequenceModel implements PlayableSequenceModel {
         throw new IllegalArgumentException("Cannot play to already filled position");
       }
     } else {
-      this.board.setChip(where, this.currentPlayer.getTeam());
-      this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
+      if (toPlay.value().equals(CardValue.ONE_EYED_JACK)) {
+        throw new IllegalArgumentException("Cannot remove from empty position");
+      } else {
+        if (toPlay.value().equals(CardValue.TWO_EYED_JACK) ||
+                !this.board.getCell(where).hasChip()) {
+          this.board.setChip(where, this.currentPlayer.getTeam());
+          this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
+        } else {
+          throw new IllegalArgumentException("Cannot play this card to that cell");
+        }
+      }
     }
-    if (this.deck.size() == 0) {
-      // make a discard deck that clears here into the actual deck
+    if (this.deck.isEmpty()) {
+      this.resetDeck();
     }
     this.hands.get(this.currentPlayer).addCard(this.deck.remove(0));
 
-    this.currentPlayer = this.turnOrder.get(this.currentPlayer);
     if (!this.isGameOver()) {
-
+      this.currentPlayer = this.turnOrder.get(this.currentPlayer);
       this.currentPlayer.beginTurn(this);
     }
   }
@@ -94,11 +102,27 @@ public class SequenceModel implements PlayableSequenceModel {
     this.deck = this.standardDeck();
     this.remainingCards = new HashMap<>();
     Collections.shuffle(this.deck, shuffler);
+    for (GameHand currHand : this.hands.values()) {
+      currHand.addCard(this.deck.remove(0));
+      currHand.addCard(this.deck.remove(0));
+    }
   }
 
   @Override
   public void beginPlaying() {
     this.currentPlayer.beginTurn(this);
+  }
+
+  @Override
+  public void resetDeck() {
+    List<Card> newDeck = this.standardDeck();
+    for (GameHand currHand : this.hands.values()) {
+      for (int card = 0; card < currHand.size(); card += 1) {
+        newDeck.remove(currHand.getCardAt(card));
+      }
+    }
+    Collections.shuffle(this.deck, this.shuffler);
+    this.deck = newDeck;
   }
 
   @Override
@@ -128,7 +152,10 @@ public class SequenceModel implements PlayableSequenceModel {
   }
 
   @Override
-  public boolean isGameOver() { // needs check for tie
+  public boolean isGameOver() {
+    if (this.board.isFull()) {
+      return true;
+    }
     for (int count : this.sequenceCounts.values()) {
       if (count == 2) {
         return true;
@@ -138,11 +165,14 @@ public class SequenceModel implements PlayableSequenceModel {
   }
 
   @Override
-  public GameChip getWinner() { // needs return for tie
+  public GameChip getWinner() {
     for (GameChip chip : this.sequenceCounts.keySet()) {
       if (this.sequenceCounts.get(chip) == 2) {
         return chip;
       }
+    }
+    if (this.board.isFull()) {
+      return GameChip.NONE;
     }
     throw new IllegalStateException("No Winner");
   }

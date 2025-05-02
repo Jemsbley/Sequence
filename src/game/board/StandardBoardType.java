@@ -55,6 +55,18 @@ public class StandardBoardType implements GameBoard {
     return toReturn;
   }
 
+  @Override
+  public boolean isFull() {
+    for (Cell[] c : this.board) {
+      for (Cell spot : c) {
+        if (!spot.hasChip()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   private boolean isValidLocation(GamePosition location) {
     return location.x() >= 0 && location.y() >= 0
             && location.x() <= this.board.length && location.y() <= this.board[0].length;

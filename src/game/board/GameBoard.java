@@ -32,4 +32,10 @@ public interface GameBoard {
    */
   Cell[][] getBoard();
 
+  /**
+   * Determines if all cells contain chips.
+   * @return false if any cell is open, false otherwise
+   */
+  boolean isFull();
+
 }
