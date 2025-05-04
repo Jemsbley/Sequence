@@ -45,9 +45,6 @@ public class PlayableCell implements Cell {
 
   @Override
   public GameChip getChip() throws IllegalStateException {
-    if (!this.hasChip()) {
-      throw new IllegalStateException("Cell does not have a chip");
-    }
     return this.chip;
   }
 

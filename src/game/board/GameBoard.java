@@ -1,5 +1,8 @@
 package game.board;
 
+import java.util.List;
+import java.util.Map;
+
 import game.enums.GameChip;
 
 /**
@@ -37,5 +40,19 @@ public interface GameBoard {
    * @return false if any cell is open, false otherwise
    */
   boolean isFull();
+
+  /**
+   * Creates and returns an extensive copy of the state of this board.
+   * @return the generated copy
+   */
+  GameBoard copy();
+
+  /**
+   * Returns a map that provides all locations of all cells on the board. This is extremely useful
+   * in automating gameplay and minimizing the amount of observations that the automation needs to
+   * make
+   * @return the cardLocations for this board type
+   */
+  Map<Card, List<GamePosition>> cardLocations();
 
 }

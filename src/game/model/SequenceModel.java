@@ -42,10 +42,10 @@ public class SequenceModel implements PlayableSequenceModel {
     }
 
     Card toPlay = playFrom.getCardAt(which);
-
     if (this.board.getCell(where).hasChip()) {
       if (toPlay.value().equals(CardValue.ONE_EYED_JACK)) {
         this.board.setChip(where, GameChip.NONE);
+        playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
       } else {
         throw new IllegalArgumentException("Cannot play to already filled position");
@@ -53,14 +53,13 @@ public class SequenceModel implements PlayableSequenceModel {
     } else {
       if (toPlay.value().equals(CardValue.ONE_EYED_JACK)) {
         throw new IllegalArgumentException("Cannot remove from empty position");
+      } else if (toPlay.value().equals(CardValue.TWO_EYED_JACK) ||
+              toPlay.sameCard(this.board.getCell(where).getCard())) {
+        this.board.setChip(where, this.currentPlayer.getTeam());
+        playFrom.removeCardAt(which);
+        this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
       } else {
-        if (toPlay.value().equals(CardValue.TWO_EYED_JACK) ||
-                !this.board.getCell(where).hasChip()) {
-          this.board.setChip(where, this.currentPlayer.getTeam());
-          this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
-        } else {
-          throw new IllegalArgumentException("Cannot play this card to that cell");
-        }
+        throw new IllegalArgumentException("Invalid move: Cards do not match");
       }
     }
     if (this.deck.isEmpty()) {
@@ -90,7 +89,7 @@ public class SequenceModel implements PlayableSequenceModel {
     this.hands = new HashMap<>();
     this.turnOrder = new HashMap<>();
     this.sequenceCounts = new HashMap<>();
-    for (int index = 1; index < players.size(); index += 1) {
+    for (int index = 0; index < players.size(); index += 1) {
       SequenceController curr = players.get(index);
       Objects.requireNonNull(curr);
       this.turnOrder.put(prev, curr);
@@ -99,8 +98,8 @@ public class SequenceModel implements PlayableSequenceModel {
       this.sequenceCounts.put(curr.getTeam(), 0);
     }
     this.turnOrder.put(prev, this.currentPlayer);
-    this.deck = this.standardDeck();
     this.remainingCards = new HashMap<>();
+    this.deck = this.standardDeck();
     Collections.shuffle(this.deck, shuffler);
     for (GameHand currHand : this.hands.values()) {
       currHand.addCard(this.deck.remove(0));
@@ -175,6 +174,16 @@ public class SequenceModel implements PlayableSequenceModel {
       return GameChip.NONE;
     }
     throw new IllegalStateException("No Winner");
+  }
+
+  @Override
+  public GameBoard getBoard() {
+    return this.board.copy();
+  }
+
+  @Override
+  public GameHand getHand(SequenceController controller) {
+    return this.hands.get(controller).copy();
   }
 
   private List<Card> standardDeck() {

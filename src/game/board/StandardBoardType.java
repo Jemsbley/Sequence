@@ -1,6 +1,8 @@
 package game.board;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import game.enums.CardSuit;
@@ -65,6 +67,28 @@ public class StandardBoardType implements GameBoard {
       }
     }
     return true;
+  }
+
+  @Override
+  public GameBoard copy() {
+    return new StandardBoardType().copyStates(this);
+  }
+
+  /**
+   * Copies all states from a given board to this board. This is used for copy construction.
+   * @param other the board to copy
+   * @return this board after finishing the copy process
+   */
+  private GameBoard copyStates(GameBoard other) {
+    for (int col = 0; col < other.getBoard().length; col += 1) {
+      for (int row = 0; row < other.getBoard()[0].length; row += 1) {
+        if (this.board[col][row].getChip().equals(GameChip.ALL)) {
+          continue;
+        }
+        this.board[col][row].setChip(other.getBoard()[col][row].getChip());
+      }
+    }
+    return this;
   }
 
   private boolean isValidLocation(GamePosition location) {
@@ -236,5 +260,25 @@ public class StandardBoardType implements GameBoard {
     standardBoard[9][9] = new FreeSpaceCell();
 
     return standardBoard;
+  }
+
+  @Override
+  public Map<Card, List<GamePosition>> cardLocations() {
+    Map<Card, List<GamePosition>> toReturn = new HashMap<>();
+    for (CardValue val : CardValue.values()) {
+      for (CardSuit suit : CardSuit.values()) {
+        toReturn.put(new BasicCard(val, suit), new ArrayList<>());
+      }
+    }
+
+    for (int col = 0; col < this.board.length; col += 1) {
+      for (int row = 0; row < this.board[0].length; row += 1) {
+        if (!this.board[col][row].getChip().equals(GameChip.ALL)) {
+          toReturn.get(this.board[col][row].getCard()).add(new GamePosition(col, row));
+        }
+      }
+    }
+
+    return toReturn;
   }
 }

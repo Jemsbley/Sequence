@@ -43,4 +43,13 @@ public class SequenceHand implements GameHand {
   public GameChip getTeam() {
     return this.team;
   }
+
+  @Override
+  public GameHand copy() {
+    GameHand toReturn = new SequenceHand(this.team);
+    for (int card = 0; card < this.size(); card += 1) {
+      toReturn.addCard(this.getCardAt(card));
+    }
+    return toReturn;
+  }
 }

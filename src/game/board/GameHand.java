@@ -41,4 +41,10 @@ public interface GameHand {
    */
   GameChip getTeam();
 
+  /**
+   * Creates and returns a copy of this hand.
+   * @return an extensive copy of this hand
+   */
+  GameHand copy();
+
 }

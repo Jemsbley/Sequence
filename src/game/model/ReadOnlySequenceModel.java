@@ -1,6 +1,8 @@
 package game.model;
 
 import game.board.Card;
+import game.board.GameBoard;
+import game.board.GameHand;
 import game.controller.SequenceController;
 import game.enums.GameChip;
 
@@ -48,5 +50,18 @@ public interface ReadOnlySequenceModel {
    * @return the winning team's GameChip
    */
   GameChip getWinner();
+
+  /**
+   * Returns a copy of the current board state of the game.
+   * @return a copy of the current board state of the game
+   */
+  GameBoard getBoard();
+
+  /**
+   * Returns a copy of the current hand state for the given player.
+   * @param controller the player to check
+   * @return an extensive copy of that player's hand
+   */
+  GameHand getHand(SequenceController controller);
 
 }
