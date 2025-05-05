@@ -8,6 +8,7 @@ import java.util.Map;
 import game.enums.CardSuit;
 import game.enums.CardValue;
 import game.enums.GameChip;
+import game.enums.SequenceType;
 
 /**
  * Implementation of the standard board in a game of sequence. Allows setting and changing
@@ -16,13 +17,28 @@ import game.enums.GameChip;
 public class StandardBoardType implements GameBoard {
 
   private final Cell[][] board;
+  private final boolean[][] vertLocks;
+  private final boolean[][] horLocks;
+
+  private final boolean[][] dupLocks;
+
+  private final boolean[][] ddowLocks;
+
 
   public StandardBoardType() {
     this.board = this.createStandardBoard();
+    this.vertLocks = new boolean[this.board.length][this.board[0].length];
+    this.horLocks = new boolean[this.board.length][this.board[0].length];
+    this.dupLocks = new boolean[this.board.length][this.board[0].length];
+    this.ddowLocks = new boolean[this.board.length][this.board[0].length];
   }
 
   public StandardBoardType(Cell[][] board) {
     this.board = this.checkBoard(board);
+    this.vertLocks = new boolean[this.board.length][this.board[0].length];
+    this.horLocks = new boolean[this.board.length][this.board[0].length];
+    this.dupLocks = new boolean[this.board.length][this.board[0].length];
+    this.ddowLocks = new boolean[this.board.length][this.board[0].length];
   }
 
   @Override
@@ -35,7 +51,9 @@ public class StandardBoardType implements GameBoard {
 
   @Override
   public void setChip(GamePosition location, GameChip toSet) throws IllegalArgumentException {
-    if (!isValidLocation(location)) {
+    if (this.isLocked(location)) {
+      throw new IllegalArgumentException("Cell is locked");
+    } else if (!isValidLocation(location)) {
       throw new IllegalArgumentException("Invalid location");
     } else if (this.board[location.x()][location.y()].hasChip()
             && this.board[location.x()][location.y()].getChip().equals(GameChip.ALL)) {
@@ -86,14 +104,22 @@ public class StandardBoardType implements GameBoard {
           continue;
         }
         this.board[col][row].setChip(other.getBoard()[col][row].getChip());
+        this.vertLocks[col][row] = other.isLocked(new GamePosition(col, row),
+                SequenceType.VERTICAL);
+        this.horLocks[col][row] = other.isLocked(new GamePosition(col, row),
+                SequenceType.HORIZONTAL);
+        this.dupLocks[col][row] = other.isLocked(new GamePosition(col, row),
+                SequenceType.DIAGONALUP);
+        this.ddowLocks[col][row] = other.isLocked(new GamePosition(col, row),
+                SequenceType.DIAGONALDOWN);
       }
     }
     return this;
   }
 
-  private boolean isValidLocation(GamePosition location) {
+  public boolean isValidLocation(GamePosition location) {
     return location.x() >= 0 && location.y() >= 0
-            && location.x() <= this.board.length && location.y() <= this.board[0].length;
+            && location.x() < this.board.length && location.y() < this.board[0].length;
   }
 
   private Cell[][] checkBoard(Cell[][] boardToCheck) {
@@ -280,5 +306,62 @@ public class StandardBoardType implements GameBoard {
     }
 
     return toReturn;
+  }
+
+  @Override
+  public void lock(GamePosition location, SequenceType mode) {
+    if (mode.equals(SequenceType.VERTICAL)) {
+      this.vertLocks[location.x()][location.y()] = true;
+    } else if (mode.equals(SequenceType.HORIZONTAL)) {
+      this.horLocks[location.x()][location.y()] = true;
+    } else if (mode.equals(SequenceType.DIAGONALUP)) {
+      this.dupLocks[location.x()][location.y()] = true;
+    } else {
+      this.ddowLocks[location.x()][location.y()] = true;
+    }
+  }
+
+  @Override
+  public boolean isLocked(GamePosition location) {
+    return this.vertLocks[location.x()][location.y()]
+            || this.horLocks[location.x()][location.y()]
+            || this.dupLocks[location.x()][location.y()]
+            || this.ddowLocks[location.x()][location.y()];
+  }
+
+  @Override
+  public boolean isLocked(GamePosition location, SequenceType mode) {
+    if (mode.equals(SequenceType.VERTICAL)) {
+      return this.vertLocks[location.x()][location.y()];
+    } else if (mode.equals(SequenceType.HORIZONTAL)) {
+      return this.horLocks[location.x()][location.y()];
+    } else if (mode.equals(SequenceType.DIAGONALUP)) {
+      return this.dupLocks[location.x()][location.y()];
+    } else {
+      return this.ddowLocks[location.x()][location.y()];
+    }
+  }
+
+  @Override
+  public Map<SequenceType, Boolean> getLocks(GamePosition location) {
+    Map<SequenceType, Boolean> toReturn = new HashMap<>();
+    toReturn.put(SequenceType.VERTICAL, this.vertLocks[location.x()][location.y()]);
+    toReturn.put(SequenceType.HORIZONTAL, this.horLocks[location.x()][location.y()]);
+    toReturn.put(SequenceType.DIAGONALUP, this.dupLocks[location.x()][location.y()]);
+    toReturn.put(SequenceType.DIAGONALDOWN, this.ddowLocks[location.x()][location.y()]);
+    return toReturn;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    for (int col = 0; col < this.board.length; col += 1) {
+      for (int row = 0; row < this.board[0].length; row += 1) {
+        if (!this.board[col][row].getChip().equals(GameChip.ALL)
+                && !this.board[col][row].getChip().equals(GameChip.NONE)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }

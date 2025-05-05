@@ -1,10 +1,17 @@
 package game.model;
 
+import java.util.List;
+import java.util.Map;
+
 import game.board.Card;
 import game.board.GameBoard;
 import game.board.GameHand;
+import game.board.GamePosition;
+import game.board.SequenceHand;
 import game.controller.SequenceController;
 import game.enums.GameChip;
+import game.enums.SequenceType;
+import game.scorekeeper.ScoreKeeper;
 
 /**
  * The behaviors of an immutable model of a sequence game. This includes all functionality that
@@ -40,7 +47,7 @@ public interface ReadOnlySequenceModel {
   /**
    * Determines if the game is over. The game is over when one team has two sequences or the game
    * board is full
-   * @return
+   * @return whether the game has ended
    */
   boolean isGameOver();
 
@@ -63,5 +70,19 @@ public interface ReadOnlySequenceModel {
    * @return an extensive copy of that player's hand
    */
   GameHand getHand(SequenceController controller);
+
+  /**
+   * Records an observation of the sequences currently completed in the game.
+   * @return a map containing lists of all sequences which begin at each point
+   */
+  Map<GamePosition, List<SequenceType>> getSequences();
+
+  /**
+   * Determines the number of sequences that the given player has.
+   * @param player a controller for the game
+   * @return how many sequences the player has
+   */
+  int numSequences(SequenceController player);
+
 
 }

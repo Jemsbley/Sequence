@@ -2,6 +2,9 @@ package game.controller;
 
 import game.enums.GameChip;
 import game.model.PlayableSequenceModel;
+import game.scorekeeper.ScoreKeeper;
+import game.view.GameFrame;
+import game.view.GameView;
 
 /**
  * The behaviors of a controller for the game. Controllers respond to requests from the model
@@ -30,4 +33,28 @@ public interface SequenceController {
    */
   GameChip getTeam();
 
+  /**
+   * Determines if this type of controller will ever use the mouse. This allows algorithmic views
+   * to ignore mouse input
+   * @return if this is a human player
+   */
+  boolean usesMouse();
+
+  /**
+   * Connects a view to this controller.
+   * @param view the view to connect
+   */
+  void addView(GameView view);
+
+  /**
+   * Accepts a deadCard move and attempts to play it.
+   * @param cardIdx the given card index in the hand to replace
+   */
+  void deadCard(int cardIdx);
+
+  /**
+   * Accepts the final game conclusion as a win, loss, or tie, depending on the provided chip.
+   * @param winner the final outcome of the game
+   */
+  void receiveGameOver(GameChip winner);
 }

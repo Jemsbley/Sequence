@@ -6,6 +6,8 @@ import java.util.Random;
 import game.board.GameBoard;
 import game.controller.GameMove;
 import game.controller.SequenceController;
+import game.scorekeeper.ScoreKeeper;
+import game.view.GameView;
 
 /**
  * The behaviors of a mutable sequence model. This includes all functionality that would alter
@@ -41,5 +43,24 @@ public interface PlayableSequenceModel extends ReadOnlySequenceModel {
    * players' hands are in the new deck (Effectively the same as reshuffling the discard pile).
    */
   void resetDeck();
+
+  /**
+   * Adds a view to the model system so it can be repainted after each move.
+   * @param toAdd the model to add
+   */
+  void addView(GameView toAdd);
+
+  /**
+   * Allows a player to discard and replace a card if there are no playable spaces for said card.
+   * @param cardIdx the card to attempt to discard
+   */
+  void deadCard(int cardIdx);
+
+
+  /**
+   * Adds the given Scorekeeper to log the results of this game.
+   * @param sk the scorekeeper to use
+   */
+  void addScoreKeeper(ScoreKeeper sk);
 
 }
