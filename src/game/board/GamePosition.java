@@ -103,4 +103,20 @@ public record GamePosition(int x, int y) {
     return this.x < 0 || (this.x == 0 && this.y == -1);
   }
 
+  /**
+   * Determines if this location is in sequence with the given one.
+   * @param other the location to check
+   * @return if the other location is in sequence with this one
+   */
+  public boolean inSequence(GamePosition other) {
+    if (other.x == this.x) {
+      return this.y - other.y < 5;
+    } else if (other.y == this.y) {
+      return this.x - other.x < 5;
+    } else {
+      return Math.abs(this.x - other.x) == Math.abs(this.y - other.y)
+              && Math.abs(this.y - other.y) < 5;
+    }
+  }
+
 }

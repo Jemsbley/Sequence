@@ -23,6 +23,7 @@ public class StandardBoardType implements GameBoard {
   private final boolean[][] dupLocks;
 
   private final boolean[][] ddowLocks;
+  private final Map<Card, List<GamePosition>> cardLocs = new HashMap<>();
 
 
   public StandardBoardType() {
@@ -31,6 +32,7 @@ public class StandardBoardType implements GameBoard {
     this.horLocks = new boolean[this.board.length][this.board[0].length];
     this.dupLocks = new boolean[this.board.length][this.board[0].length];
     this.ddowLocks = new boolean[this.board.length][this.board[0].length];
+    this.makeCardLocations();
   }
 
   public StandardBoardType(Cell[][] board) {
@@ -39,6 +41,7 @@ public class StandardBoardType implements GameBoard {
     this.horLocks = new boolean[this.board.length][this.board[0].length];
     this.dupLocks = new boolean[this.board.length][this.board[0].length];
     this.ddowLocks = new boolean[this.board.length][this.board[0].length];
+    this.makeCardLocations();
   }
 
   @Override
@@ -52,7 +55,7 @@ public class StandardBoardType implements GameBoard {
   @Override
   public void setChip(GamePosition location, GameChip toSet) throws IllegalArgumentException {
     if (this.isLocked(location)) {
-      throw new IllegalArgumentException("Cell is locked");
+      throw new IllegalArgumentException("Cell is locked: " + location + " " + toSet);
     } else if (!isValidLocation(location)) {
       throw new IllegalArgumentException("Invalid location");
     } else if (this.board[location.x()][location.y()].hasChip()
@@ -288,24 +291,26 @@ public class StandardBoardType implements GameBoard {
     return standardBoard;
   }
 
-  @Override
-  public Map<Card, List<GamePosition>> cardLocations() {
+  private void makeCardLocations() {
     Map<Card, List<GamePosition>> toReturn = new HashMap<>();
     for (CardValue val : CardValue.values()) {
       for (CardSuit suit : CardSuit.values()) {
-        toReturn.put(new BasicCard(val, suit), new ArrayList<>());
+        this.cardLocs.put(new BasicCard(val, suit), new ArrayList<>());
       }
     }
 
     for (int col = 0; col < this.board.length; col += 1) {
       for (int row = 0; row < this.board[0].length; row += 1) {
         if (!this.board[col][row].getChip().equals(GameChip.ALL)) {
-          toReturn.get(this.board[col][row].getCard()).add(new GamePosition(col, row));
+          this.cardLocs.get(this.board[col][row].getCard()).add(new GamePosition(col, row));
         }
       }
     }
+  }
 
-    return toReturn;
+  @Override
+  public Map<Card, List<GamePosition>> cardLocations() {
+    return this.cardLocs;
   }
 
   @Override

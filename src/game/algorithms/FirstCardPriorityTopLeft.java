@@ -51,16 +51,16 @@ public class FirstCardPriorityTopLeft implements SequenceAlgorithm {
             }
           }
         }
-      } else {
-        List<GamePosition> options = bd.cardLocations().get(card1);
-        for (GamePosition pos : options) {
-          if (!layout[pos.x()][pos.y()].hasChip()) {
-            receiver.receiveMove(new GameMove(pos, firstPlayable));
-            return;
-          }
-        }
-        receiver.deadCard(firstPlayable);
       }
+      List<GamePosition> options = bd.cardLocations().get(card1);
+      for (GamePosition pos : options) {
+        if (!layout[pos.x()][pos.y()].hasChip()) {
+          receiver.receiveMove(new GameMove(pos, firstPlayable));
+          return;
+        }
+      }
+      receiver.deadCard(firstPlayable);
+
     }
 
   }

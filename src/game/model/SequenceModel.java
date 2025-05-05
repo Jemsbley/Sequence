@@ -48,8 +48,8 @@ public class SequenceModel implements PlayableSequenceModel {
     for (GamePosition loc : this.board.cardLocations()
             .get(playerHand.getCardAt(cardIdx))) {
       if (!this.board.getCell(loc).hasChip()) {
-        throw new IllegalStateException("Card is not dead: " + playerHand.getCardAt(cardIdx) + "\n"
-        + "On turn " + this.currentPlayer.getTeam());
+        throw new IllegalStateException("Card is not dead: " + playerHand.getCardAt(cardIdx)
+        + " on turn " + this.currentPlayer.getTeam());
       }
     }
     playerHand.removeCardAt(cardIdx);
@@ -71,7 +71,8 @@ public class SequenceModel implements PlayableSequenceModel {
     GameHand playFrom = this.hands.get(this.currentPlayer);
 
     if (which < 0 || which > playFrom.size() - 1) {
-      throw new IllegalArgumentException("Invalid hand index for move");
+      throw new IllegalArgumentException("Invalid hand index for move: " + which
+              + " for " + playFrom.size());
     }
 
     Card toPlay = playFrom.getCardAt(which);
@@ -84,7 +85,9 @@ public class SequenceModel implements PlayableSequenceModel {
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
       } else {
-        throw new IllegalArgumentException("Cannot play to already filled position");
+        throw new IllegalArgumentException("Cannot play to already filled position "
+                + playFrom.getCardAt(which) + " at "
+                + where + " on turn " + currentPlayer.getTeam());
       }
     } else {
       if (toPlay.value().equals(CardValue.ONE_EYED_JACK)) {
