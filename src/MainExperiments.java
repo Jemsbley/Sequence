@@ -1,8 +1,10 @@
 import java.util.List;
 import java.util.Random;
 
-import game.algorithms.AsRandomAsCanBe;
-import game.algorithms.NetworkBuildingMinimizeOneEyes;
+import game.algorithms.DefensiveNetworkBuilding;
+import game.algorithms.OffensiveNetworkBuilding;
+import game.algorithms.RandomNetworkBuilding;
+import game.algorithms.ScoredNetworkBuilding;
 import game.board.GameBoard;
 import game.board.StandardBoardType;
 import game.controller.AlgorithmController;
@@ -22,9 +24,9 @@ public class MainExperiments {
     GameBoard def = new StandardBoardType();
     SequenceController blueGuy = new HumanController(model, GameChip.BLUE);
     SequenceController redGuy = new HumanController(model, GameChip.RED);
-    SequenceController greenCPU = new AlgorithmController(new NetworkBuildingMinimizeOneEyes(),
+    SequenceController greenCPU = new AlgorithmController(new OffensiveNetworkBuilding(),
             model, GameChip.GREEN);
-    SequenceController redCPU = new AlgorithmController(new AsRandomAsCanBe(),
+    SequenceController redCPU = new AlgorithmController(new ScoredNetworkBuilding(),
             model, GameChip.RED);
 
 
@@ -54,11 +56,11 @@ public class MainExperiments {
     for (int reps = 0; reps < 1000; reps += 1) {
       model = new SequenceModel();
       def = new StandardBoardType();
-      greenCPU = new AlgorithmController(new NetworkBuildingMinimizeOneEyes(),
+      greenCPU = new AlgorithmController(new OffensiveNetworkBuilding(),
               model, GameChip.GREEN);
-      redCPU = new AlgorithmController(new AsRandomAsCanBe(),
+      redCPU = new AlgorithmController(new ScoredNetworkBuilding(),
               model, GameChip.RED);
-      model.initializeGame(def, List.of(redCPU, greenCPU), new Random(reps));
+      model.initializeGame(def, List.of(redCPU, greenCPU), new Random());
       greenCPU.addView(gf3);
       redCPU.addView(gf4);
       model.addView(gf3);

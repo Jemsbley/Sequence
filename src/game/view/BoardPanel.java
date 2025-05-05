@@ -1,6 +1,7 @@
 package game.view;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,6 +62,21 @@ public class BoardPanel extends JPanel {
           g2d.fillRect(currCol * widthPer, currRow * heightPer, widthPer, heightPer);
           g2d.setColor(Color.lightGray);
           g2d.drawRect(currCol * widthPer, currRow * heightPer, widthPer, heightPer);
+          g2d.setColor(GameChip.BLUE.color());
+          g2d.fillArc(currCol * widthPer + widthPer / 4,
+                  currRow * heightPer + heightPer / 4,
+                  widthPer / 2, heightPer / 2,
+                  0, 120);
+          g2d.setColor(GameChip.RED.color());
+          g2d.fillArc(currCol * widthPer + widthPer / 4,
+                  currRow * heightPer + heightPer / 4,
+                  widthPer / 2, heightPer / 2,
+                  120, 120);
+          g2d.setColor(GameChip.GREEN.color());
+          g2d.fillArc(currCol * widthPer + widthPer / 4,
+                  currRow * heightPer + heightPer / 4,
+                  widthPer / 2, heightPer / 2,
+                  240, 120);
         } else {
           if (this.selected != null) {
             if (this.selected.value().equals(CardValue.TWO_EYED_JACK) &&
@@ -102,7 +118,7 @@ public class BoardPanel extends JPanel {
 
     g2d.setColor(Color.BLACK);
     for (GamePosition pos : this.sequences.keySet()) {
-      java.util.List<SequenceType> seqs = this.sequences.get(pos);
+      java.util.List<SequenceType> seqs = new ArrayList<>(this.sequences.get(pos));
       for (SequenceType seq : seqs) {
         GamePosition end = pos.copy();
         for (int times = 0; times < 4; times += 1) {

@@ -14,6 +14,9 @@ import game.controller.SequenceController;
 import game.enums.CardValue;
 import game.model.PlayableSequenceModel;
 
+/**
+ * As close to true random as I could think. Picks a card at random and picks a random spot for it.
+ */
 public class AsRandomAsCanBe implements SequenceAlgorithm {
 
   @Override

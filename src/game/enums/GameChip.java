@@ -20,6 +20,8 @@ public enum GameChip {
       return new Color(20,100,200);
     } else if (this.equals(GameChip.GREEN)) {
       return new Color(100,200,20);
+    } else if (this.equals(GameChip.ALL)){
+      return new Color(103, 103, 103);
     } else {
       throw new IllegalStateException("Cannot get the color for this type of chip.");
     }

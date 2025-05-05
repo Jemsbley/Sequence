@@ -14,7 +14,12 @@ import game.enums.CardValue;
 import game.enums.GameChip;
 import game.model.PlayableSequenceModel;
 
-public class NetworkBuildingMinimizeOneEyes implements SequenceAlgorithm {
+/**
+ * See NetworkBuildingMinimizeOneEyes: This algorithm functions in the opposite direction, picking
+ * the card in sequence with as FEW other pieces as possible. Effectively, this avoids scoring
+ * a point until it is the only choice.
+ */
+public class InverseNetworkBuilding implements SequenceAlgorithm {
   @Override
   public void beginTurn(PlayableSequenceModel model, SequenceController receiver) {
     GameBoard bd = model.getBoard();
@@ -33,7 +38,7 @@ public class NetworkBuildingMinimizeOneEyes implements SequenceAlgorithm {
       boolean deadCarded = false;
       GamePosition bestLoc = new GamePosition(-1, -1);
       int bestCard = -1;
-      int bestCount = 0;
+      int bestCount = 10;
       GameHand myHand = model.getHand(receiver);
       for (int card = 0; card < myHand.size(); card += 1) {
         Card current = myHand.getCardAt(card);
@@ -43,16 +48,16 @@ public class NetworkBuildingMinimizeOneEyes implements SequenceAlgorithm {
         if (current.value().equals(CardValue.TWO_EYED_JACK)) {
           for (int col = 0; col < layout.length; col += 1) {
             for (int row = 0; row < layout[0].length; row += 1) {
+              if (bd.getCell(new GamePosition(col, row)).hasChip()) {
+                continue;
+              }
               int count = 0;
               for (GamePosition pos : mine) {
-                if (bd.getCell(new GamePosition(col, row)).hasChip()) {
-                  continue;
-                }
                 if (new GamePosition(col, row).inSequence(pos)) {
                   count += 1;
                 }
               }
-              if (bestCard == -1 || bestCount < count) {
+              if (bestCard == -1 || bestCount > count) {
                 bestCard = card;
                 bestCount = count;
                 bestLoc = new GamePosition(col, row);
@@ -74,7 +79,7 @@ public class NetworkBuildingMinimizeOneEyes implements SequenceAlgorithm {
                 count += 1;
               }
             }
-            if (bestCard == -1 || bestCount <= count) {
+            if (bestCard == -1 || bestCount >= count) {
               bestCard = card;
               bestCount = count;
               bestLoc = loc;
@@ -107,6 +112,5 @@ public class NetworkBuildingMinimizeOneEyes implements SequenceAlgorithm {
         return;
       }
     }
-
   }
 }
