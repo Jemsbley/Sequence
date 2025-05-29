@@ -14,22 +14,15 @@ import game.enums.CardValue;
 import game.enums.GameChip;
 import game.model.PlayableSequenceModel;
 
-/**
- * Behaves similarly to the RandomNetworkBuilding, but instead of picking at random it will find
- * both solutions and compare them by scoring. A defensive move is scored by the amount of opposing
- * cells it is in sequence with, and an offensive one is scored by the amount of allied cells.
- * If a defensive move score is greater than threshold*offensive score, it will be chosen.
- * Threshold is defaulted to 1
- */
-public class ScoredNetworkBuilding implements SequenceAlgorithm {
+public class FarsightedScoredNetworkBuilding implements SequenceAlgorithm {
 
   private final double threshold;
 
-  public ScoredNetworkBuilding() {
+  public FarsightedScoredNetworkBuilding() {
     this.threshold = 1;
   }
 
-  public ScoredNetworkBuilding(double threshold) {
+  public FarsightedScoredNetworkBuilding(double threshold) {
     if (threshold < 0) {
       throw new IllegalArgumentException("Threshold must be positive: given " + threshold);
     }
@@ -60,14 +53,34 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
     int defCount = 0;
     int offCount = 0;
 
+    GameBoard bd = model.getBoard();
+    GameHand myHand = model.getHand(receiver);
+
+    List<GamePosition> myHandLocs = new ArrayList<>();
+    for (int card = 0; card < myHand.size(); card += 1) {
+      myHandLocs.addAll(bd.cardLocations().get(myHand.getCardAt(card)));
+    }
+
     for (GamePosition loc : theirs) {
       if (loc.inSequence(def.location())) {
         defCount += 1;
       }
     }
 
+    for (GamePosition pos : myHandLocs) {
+      if (pos.inSequence(def.location())) {
+        defCount += 1;
+      }
+    }
+
     for (GamePosition loc : mine) {
       if (loc.inSequence(off.location())) {
+        offCount += 1;
+      }
+    }
+
+    for (GamePosition pos : myHandLocs) {
+      if (pos.inSequence(off.location())) {
         offCount += 1;
       }
     }
@@ -92,6 +105,12 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
       int bestCard = -1;
       int bestCount = 0;
       GameHand myHand = model.getHand(receiver);
+
+      List<GamePosition> myHandLocs = new ArrayList<>();
+      for (int card = 0; card < myHand.size(); card += 1) {
+        myHandLocs.addAll(bd.cardLocations().get(myHand.getCardAt(card)));
+      }
+
       for (int card = 0; card < myHand.size(); card += 1) {
         Card current = myHand.getCardAt(card);
         if (current.value().equals(CardValue.ONE_EYED_JACK)) {
@@ -109,6 +128,13 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
                   count += 1;
                 }
               }
+
+              for (GamePosition pos : myHandLocs) {
+                if (new GamePosition(col, row).inSequence(pos)) {
+                  count += 1;
+                }
+              }
+
               if (bestCard == -1 || bestCount < count) {
                 bestCard = card;
                 bestCount = count;
@@ -131,6 +157,13 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
                 count += 1;
               }
             }
+
+            for (GamePosition pos : myHandLocs) {
+              if (loc.inSequence(pos)) {
+                count += 1;
+              }
+            }
+
             if (bestCard == -1 || bestCount <= count) {
               bestCard = card;
               bestCount = count;
@@ -175,6 +208,12 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
       int bestCard = -1;
       int bestCount = 0;
       GameHand myHand = model.getHand(receiver);
+
+      List<GamePosition> myHandLocs = new ArrayList<>();
+      for (int card = 0; card < myHand.size(); card += 1) {
+        myHandLocs.addAll(bd.cardLocations().get(myHand.getCardAt(card)));
+      }
+
       for (int card = 0; card < myHand.size(); card += 1) {
         Card current = myHand.getCardAt(card);
         if (current.value().equals(CardValue.ONE_EYED_JACK)) {
@@ -192,6 +231,13 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
                   count += 1;
                 }
               }
+
+              for (GamePosition pos : myHandLocs) {
+                if (new GamePosition(col, row).inSequence(pos)) {
+                  count += 1;
+                }
+              }
+
               if (bestCard == -1 || bestCount < count) {
                 bestCard = card;
                 bestCount = count;
@@ -214,6 +260,13 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
                 count += 1;
               }
             }
+
+            for (GamePosition pos : myHandLocs) {
+              if (loc.inSequence(pos)) {
+                count += 1;
+              }
+            }
+
             if (bestCard == -1 || bestCount <= count) {
               bestCard = card;
               bestCount = count;
@@ -247,4 +300,5 @@ public class ScoredNetworkBuilding implements SequenceAlgorithm {
       }
     }
   }
+
 }
