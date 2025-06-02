@@ -36,6 +36,7 @@ public class SequenceModel implements PlayableSequenceModel {
   private Random shuffler;
   private Map<GamePosition, List<SequenceType>> sequences = new HashMap<>();
   private final List<GameView> views = new ArrayList<>();
+  private Map<GameChip, List<GamePosition>> chips;
   private ScoreKeeper tracker;
 
   public void addView(GameView toAdd) {
@@ -81,6 +82,7 @@ public class SequenceModel implements PlayableSequenceModel {
         if (this.board.getCell(where).getChip().equals(this.currentPlayer.getTeam())) {
           throw new IllegalArgumentException("Cannot remove your own pieces");
         }
+        this.chips.get(this.board.getCell(where).getChip()).remove(where);
         this.board.setChip(where, GameChip.NONE);
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
@@ -94,6 +96,7 @@ public class SequenceModel implements PlayableSequenceModel {
         throw new IllegalArgumentException("Cannot remove from empty position");
       } else if (toPlay.value().equals(CardValue.TWO_EYED_JACK) ||
               toPlay.sameCard(this.board.getCell(where).getCard())) {
+        this.chips.get(this.currentPlayer.getTeam()).add(where);
         this.board.setChip(where, this.currentPlayer.getTeam());
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
@@ -226,10 +229,14 @@ public class SequenceModel implements PlayableSequenceModel {
     this.deck = this.standardDeck();
     Collections.shuffle(this.deck, shuffler);
 
+    this.chips = new HashMap<>();
+    this.chips.put(GameChip.RED, new ArrayList<>());
+    this.chips.put(GameChip.BLUE, new ArrayList<>());
     int numColors = 2;
     for (SequenceController cont : players) {
       if (cont.getTeam().equals(GameChip.GREEN)) {
         numColors = 3;
+        this.chips.put(GameChip.GREEN, new ArrayList<>());
       }
     }
 
@@ -239,6 +246,8 @@ public class SequenceModel implements PlayableSequenceModel {
         currHand.addCard(this.deck.remove(0));
       }
     }
+
+
   }
 
   @Override
@@ -366,6 +375,15 @@ public class SequenceModel implements PlayableSequenceModel {
   @Override
   public int numSequences(SequenceController player) {
     return this.sequenceCounts.get(player.getTeam());
+  }
+
+  @Override
+  public Map<GameChip, List<GamePosition>> getChips() {
+    Map<GameChip, List<GamePosition>> toReturn = new HashMap<>();
+    for (GameChip chip : this.chips.keySet()) {
+      toReturn.put(chip, new ArrayList<>(this.chips.get(chip)));
+    }
+    return toReturn;
   }
 
   private List<Card> standardDeck() {

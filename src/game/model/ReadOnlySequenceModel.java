@@ -84,5 +84,9 @@ public interface ReadOnlySequenceModel {
    */
   int numSequences(SequenceController player);
 
-
+  /**
+   * Accesses a copy of the current lists of positions where each chip is.
+   * @return a map from GameChip to lists of GamePositions which are held by each player
+   */
+  Map<GameChip, List<GamePosition>> getChips();
 }

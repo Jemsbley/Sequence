@@ -31,14 +31,14 @@ public class MainExperiments {
     int realplayers = 0;
 
     if (realplayers == 0) {
-      SequenceController greenCPU = new AlgorithmController(new AsRandomAsCanBe(),
-              model, GameChip.GREEN);
+      SequenceController blueCPU = new AlgorithmController(new AsRandomAsCanBe(),
+              model, GameChip.BLUE);
       SequenceController redCPU = new AlgorithmController(new AsRandomAsCanBe(),
               model, GameChip.RED);
-      model.initializeGame(def, List.of(redCPU, greenCPU), new Random(0));
-      GameFrame gf3 = new GameFrame(model, greenCPU);
+      model.initializeGame(def, List.of(redCPU, blueCPU), new Random(0));
+      GameFrame gf3 = new GameFrame(model, blueCPU);
       GameFrame gf4 = new GameFrame(model, redCPU);
-      greenCPU.addView(gf3);
+      blueCPU.addView(gf3);
       redCPU.addView(gf4);
       model.addView(gf3);
       model.addView(gf4);
@@ -46,25 +46,25 @@ public class MainExperiments {
       gf4.setVisible(true);
 
       ScoreKeeper sk = new TwoPlayerScoreKeeper();
-      sk.addPlayer(GameChip.GREEN);
+      sk.addPlayer(GameChip.BLUE);
       sk.addPlayer(GameChip.RED);
       for (int reps = 0; reps < 1000; reps += 1) {
         model = new SequenceModel();
         def = new StandardBoardType();
-        greenCPU = new AlgorithmController(new FarsightedScoredNetworkBuilding(2),
-                model, GameChip.GREEN);
-        redCPU = new AlgorithmController(new FarsightedOffensiveNetworkBuilding(),
+        blueCPU = new AlgorithmController(new FarsightedScoredNetworkBuilding(),
+                model, GameChip.BLUE);
+        redCPU = new AlgorithmController(new FarsightedScoredNetworkBuilding(2),
                 model, GameChip.RED);
-        model.initializeGame(def, List.of(redCPU, greenCPU), new Random());
-        greenCPU.addView(gf3);
+        model.initializeGame(def, List.of(redCPU, blueCPU), new Random());
+        blueCPU.addView(gf3);
         redCPU.addView(gf4);
         model.addView(gf3);
         model.addView(gf4);
-        gf3.reset(model, greenCPU);
+        gf3.reset(model, blueCPU);
         gf4.reset(model, redCPU);
         model.addScoreKeeper(sk);
         model.beginPlaying();
-        if (model.numSequences(greenCPU) >= 2 && model.numSequences(redCPU) >= 2) {
+        if (model.numSequences(blueCPU) >= 2 && model.numSequences(redCPU) >= 2) {
           throw new IllegalStateException("Both won but somehow nobody did");
         }
       }
