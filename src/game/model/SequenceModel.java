@@ -21,7 +21,6 @@ import game.enums.CardValue;
 import game.enums.GameChip;
 import game.enums.SequenceType;
 import game.scorekeeper.ScoreKeeper;
-import game.view.GameFrame;
 import game.view.GameView;
 
 public class SequenceModel implements PlayableSequenceModel {
@@ -34,9 +33,10 @@ public class SequenceModel implements PlayableSequenceModel {
   private Map<GameChip, Integer> sequenceCounts;
   private Map<Card, Integer> remainingCards;
   private Random shuffler;
-  private Map<GamePosition, List<SequenceType>> sequences = new HashMap<>();
+  private final Map<GamePosition, List<SequenceType>> sequences = new HashMap<>();
   private final List<GameView> views = new ArrayList<>();
   private Map<GameChip, List<GamePosition>> chips;
+  private int numChipsPresent;
   private ScoreKeeper tracker;
 
   public void addView(GameView toAdd) {
@@ -54,7 +54,7 @@ public class SequenceModel implements PlayableSequenceModel {
       }
     }
     playerHand.removeCardAt(cardIdx);
-    if (deck.size() == 0) {
+    if (deck.isEmpty()) {
       this.resetDeck();
     }
     playerHand.addCard(this.deck.remove(0));
@@ -86,6 +86,7 @@ public class SequenceModel implements PlayableSequenceModel {
         this.board.setChip(where, GameChip.NONE);
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
+        this.numChipsPresent -= 1;
       } else {
         throw new IllegalArgumentException("Cannot play to already filled position "
                 + playFrom.getCardAt(which) + " at "
@@ -93,13 +94,15 @@ public class SequenceModel implements PlayableSequenceModel {
       }
     } else {
       if (toPlay.value().equals(CardValue.ONE_EYED_JACK)) {
-        throw new IllegalArgumentException("Cannot remove from empty position");
+        throw new IllegalArgumentException("Cannot remove from empty position: "
+                + where + " on turn " + this.currentPlayer.getTeam());
       } else if (toPlay.value().equals(CardValue.TWO_EYED_JACK) ||
               toPlay.sameCard(this.board.getCell(where).getCard())) {
         this.chips.get(this.currentPlayer.getTeam()).add(where);
         this.board.setChip(where, this.currentPlayer.getTeam());
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
+        this.numChipsPresent += 1;
 
         List<GamePosition> skips = new ArrayList<>();
         List<GamePosition> matches = this.matchingNeighbors(where);
@@ -107,8 +110,8 @@ public class SequenceModel implements PlayableSequenceModel {
           if (skips.contains(match)) {
             continue;
           }
-          int countUp = 0;
-          int countDown = 0;
+          int countUp ;
+          int countDown;
           if (where.relation(match).goesBackward()) {
             countUp = extent(where, where.relation(match));
             countDown = extent(where, match.relation(where));
@@ -216,8 +219,7 @@ public class SequenceModel implements PlayableSequenceModel {
     this.hands = new HashMap<>();
     this.turnOrder = new HashMap<>();
     this.sequenceCounts = new HashMap<>();
-    for (int index = 0; index < players.size(); index += 1) {
-      SequenceController curr = players.get(index);
+    for (SequenceController curr : players) {
       Objects.requireNonNull(curr);
       this.turnOrder.put(prev, curr);
       prev = curr;
@@ -232,13 +234,15 @@ public class SequenceModel implements PlayableSequenceModel {
     this.chips = new HashMap<>();
     this.chips.put(GameChip.RED, new ArrayList<>());
     this.chips.put(GameChip.BLUE, new ArrayList<>());
+    this.chips.put(GameChip.GREEN, new ArrayList<>());
     int numColors = 2;
     for (SequenceController cont : players) {
       if (cont.getTeam().equals(GameChip.GREEN)) {
         numColors = 3;
-        this.chips.put(GameChip.GREEN, new ArrayList<>());
       }
     }
+
+    this.numChipsPresent = 0;
 
     int cardsPer = this.cardsPerPlayer(players.size(), numColors);
     for (GameHand currHand : this.hands.values()) {
@@ -382,6 +386,94 @@ public class SequenceModel implements PlayableSequenceModel {
     Map<GameChip, List<GamePosition>> toReturn = new HashMap<>();
     for (GameChip chip : this.chips.keySet()) {
       toReturn.put(chip, new ArrayList<>(this.chips.get(chip)));
+    }
+    return toReturn;
+  }
+
+  @Override
+  public List<List<GamePosition>> findOpeningForSequence(GameChip team) {
+    // For now I'm gonna have it search all played pieces anyways and maybe later ill add the
+    // speedup because for now it would require a bit more work and I'd rather make it run
+    List<List<GamePosition>> toReturn = new ArrayList<>();
+
+//    if (this.numChipsPresent <= this.board.numPlayableSpaces() / 2) {
+      List<GamePosition> allied = this.chips.get(team);
+      for (GamePosition ally : allied) {
+        List<GamePosition> neighbors = ally.neighbors();
+        for (GamePosition neighbor : neighbors) {
+          if (!this.board.isValidLocation(neighbor)) {
+            continue;
+          }
+          int numEmpty = 0;
+          GamePosition dir = neighbor.relation(ally);
+          GamePosition opening = new GamePosition(-1,-1);
+          if (!this.board.getCell(neighbor).getChip().equals(team)) {
+            numEmpty = 1;
+            opening = neighbor.copy();
+          }
+          GamePosition curr = neighbor.copy();
+          boolean enoughSpace = true;
+          for (int dist = 1; dist < 4; dist += 1) {
+            curr = curr.get(dir);
+            if (!this.board.isValidLocation(curr)) {
+              enoughSpace = false;
+              break;
+            }
+            GameChip atPos = this.board.getCell(curr).getChip();
+            if (atPos.equals(GameChip.NONE) ||
+                    (!atPos.equals(GameChip.ALL) && !atPos.equals(team))) {
+              opening = curr.copy();
+              numEmpty += 1;
+            }
+            if (numEmpty > 1) {
+              break;
+            }
+          }
+
+          if (enoughSpace && numEmpty == 1) {
+            boolean skipThis = false;
+            for (List<GamePosition> pair : toReturn) {
+              if (pair.get(1).equals(opening)) {
+                skipThis = true;
+              }
+            }
+            if (skipThis) {
+              continue;
+            }
+            List<GamePosition> pair = new ArrayList<>();
+            pair.add(ally);
+            pair.add(opening);
+            toReturn.add(pair);
+          }
+        }
+      }
+//    } else {
+//      throw new IllegalArgumentException("bru");
+//    }
+    return toReturn;
+  }
+
+  private Map<SequenceType, List<GamePosition>> getAllSequencedSpots(GameChip team) {
+    Map<SequenceType, List <GamePosition>> toReturn = new HashMap<>();
+    for (SequenceType type : SequenceType.values()) {
+      toReturn.put(type, new ArrayList<>());
+    }
+    for (GamePosition header : this.sequences.keySet()) {
+      GameChip atHeader = this.board.getCell(header).getChip();
+      if (!atHeader.equals(team) && !atHeader.equals(GameChip.ALL)) {
+        continue;
+      }
+      for (SequenceType type : this.sequences.get(header)) {
+        GamePosition dir = type.naturalDirection();
+        if (atHeader.equals(GameChip.ALL)
+                && !this.board.getCell(header.get(dir)).getChip().equals(team)) {
+          continue;
+        }
+        toReturn.get(type).add(header);
+        for (int pos = 0; pos < 4; pos += 1) {
+          toReturn.get(type).add(header.get(dir));
+        }
+      }
     }
     return toReturn;
   }

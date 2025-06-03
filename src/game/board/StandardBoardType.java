@@ -47,7 +47,7 @@ public class StandardBoardType implements GameBoard {
   @Override
   public Cell getCell(GamePosition location) throws IllegalArgumentException {
     if (!isValidLocation(location)) {
-      throw new IllegalArgumentException("Invalid location");
+      throw new IllegalArgumentException("Invalid location: " + location.x() + ", " + location.y());
     }
     return this.board[location.x()][location.y()].copy();
   }
@@ -368,5 +368,10 @@ public class StandardBoardType implements GameBoard {
       }
     }
     return true;
+  }
+
+  @Override
+  public int numPlayableSpaces() {
+    return 96; // 10 x 10 -> 100 - 4 free spaces -> 96
   }
 }

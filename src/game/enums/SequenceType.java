@@ -35,4 +35,16 @@ public enum SequenceType {
       return from.get(new GamePosition(1, 1));
     }
   }
+
+  public GamePosition naturalDirection() {
+    if (this.equals(SequenceType.HORIZONTAL)) {
+      return new GamePosition(1, 0);
+    } else if (this.equals(SequenceType.VERTICAL)) {
+      return new GamePosition(0, 1);
+    } else if (this.equals(SequenceType.DIAGONALUP)) {
+      return new GamePosition(1, -1);
+    } else {
+      return new GamePosition(1, 1);
+    }
+  }
 }

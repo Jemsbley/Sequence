@@ -98,4 +98,10 @@ public interface GameBoard {
    */
   boolean isEmpty();
 
+  /**
+   * Determines how many total playable spaces are on the board when empty.
+   * @return the count of playable spaces on the board
+   */
+  int numPlayableSpaces();
+
 }

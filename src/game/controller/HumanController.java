@@ -50,8 +50,8 @@ public class HumanController implements SequenceController {
 
   @Override
   public void receiveMove(GameMove moveToPlay) {
-    this.model.playToCell(moveToPlay);
     try {
+      this.model.playToCell(moveToPlay);
     } catch (IllegalArgumentException e) {
       this.view.popUp(e.getMessage());
     }

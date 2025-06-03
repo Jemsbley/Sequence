@@ -32,18 +32,19 @@ public class FarsightedScoredNetworkBuilding implements SequenceAlgorithm {
 
   @Override
   public void beginTurn(PlayableSequenceModel model, SequenceController receiver) {
-    Cell[][] layout = model.getBoard().getBoard();
+//    Cell[][] layout = model.getBoard().getBoard();
 
     Map<GameChip, List<GamePosition>> chips = model.getChips();
 
     List<GamePosition> theirs = new ArrayList<>();
+
     for (GameChip chip : chips.keySet()) {
-      if (chip.equals(receiver.getTeam())) {
-        continue;
-      } else {
+      if (!chip.equals(receiver.getTeam())) {
         theirs.addAll(chips.get(chip));
       }
     }
+
+
     List<GamePosition> mine = chips.get(receiver.getTeam());
 //    for (int col = 0; col < layout.length; col += 1) {
 //      for (int row = 0; row < layout[0].length; row += 1) {

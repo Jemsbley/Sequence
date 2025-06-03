@@ -7,11 +7,9 @@ import game.board.Card;
 import game.board.GameBoard;
 import game.board.GameHand;
 import game.board.GamePosition;
-import game.board.SequenceHand;
 import game.controller.SequenceController;
 import game.enums.GameChip;
 import game.enums.SequenceType;
-import game.scorekeeper.ScoreKeeper;
 
 /**
  * The behaviors of an immutable model of a sequence game. This includes all functionality that
@@ -89,4 +87,12 @@ public interface ReadOnlySequenceModel {
    * @return a map from GameChip to lists of GamePositions which are held by each player
    */
   Map<GameChip, List<GamePosition>> getChips();
+
+  /**
+   * Finds all positions on the board for which playing the given chip would create a sequence.
+   * @param team the team color to look for
+   * @return the list of all such positions in pair format with another position that is currently
+   * held by the player. Format: (Origin position, opening)
+   */
+  List<List<GamePosition>> findOpeningForSequence(GameChip team);
 }
