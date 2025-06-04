@@ -12,7 +12,6 @@ import game.controller.GameMove;
 import game.controller.SequenceController;
 import game.enums.CardValue;
 import game.enums.GameChip;
-import game.enums.SequenceType;
 import game.model.PlayableSequenceModel;
 
 /**

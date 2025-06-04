@@ -11,6 +11,7 @@ import game.algorithms.InverseNetworkBuilding;
 import game.algorithms.OffensiveNetworkBuilding;
 import game.algorithms.RandomNetworkBuilding;
 import game.algorithms.ScoredNetworkBuilding;
+import game.algorithms.TwoNeurons;
 import game.board.GameBoard;
 import game.board.StandardBoardType;
 import game.controller.AlgorithmController;
@@ -55,7 +56,7 @@ public class MainExperiments {
         def = new StandardBoardType();
         blueCPU = new AlgorithmController(new FarsightedScoredNetworkBuilding(),
                 model, GameChip.BLUE);
-        redCPU = new AlgorithmController(new FarsightedOffensiveSavingNetworkBuilding(),
+        redCPU = new AlgorithmController(new AsRandomAsCanBe(),
                 model, GameChip.RED);
         model.initializeGame(def, List.of(redCPU, blueCPU), new Random());
         blueCPU.addView(gf3);
@@ -76,7 +77,7 @@ public class MainExperiments {
       SequenceController blueGuy = new HumanController(model, GameChip.BLUE);
       SequenceController redCPU = new AlgorithmController(new FarsightedOffensiveSavingNetworkBuilding(),
               model, GameChip.RED);
-      model.initializeGame(def, List.of(blueGuy, redCPU), new Random(1));
+      model.initializeGame(def, List.of(blueGuy, redCPU), new Random());
       GameFrame gf = new GameFrame(model, blueGuy);
       GameFrame gf4 = new GameFrame(model, redCPU);
       blueGuy.addView(gf);
@@ -89,7 +90,7 @@ public class MainExperiments {
     } else if (realplayers == 2) {
       SequenceController blueGuy = new HumanController(model, GameChip.BLUE);
       SequenceController redGuy = new HumanController(model, GameChip.RED);
-      model.initializeGame(def, List.of(blueGuy, redGuy), new Random(0));
+      model.initializeGame(def, List.of(redGuy, blueGuy), new Random(0));
       GameFrame gf = new GameFrame(model, blueGuy);
       GameFrame gf2 = new GameFrame(model, redGuy);
       blueGuy.addView(gf);

@@ -37,6 +37,7 @@ public class SequenceModel implements PlayableSequenceModel {
   private final List<GameView> views = new ArrayList<>();
   private Map<GameChip, List<GamePosition>> chips;
   private int numChipsPresent;
+  private int numMovesMade;
   private ScoreKeeper tracker;
 
   public void addView(GameView toAdd) {
@@ -87,6 +88,7 @@ public class SequenceModel implements PlayableSequenceModel {
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
         this.numChipsPresent -= 1;
+        this.numMovesMade += 1;
       } else {
         throw new IllegalArgumentException("Cannot play to already filled position "
                 + playFrom.getCardAt(which) + " at "
@@ -103,6 +105,7 @@ public class SequenceModel implements PlayableSequenceModel {
         playFrom.removeCardAt(which);
         this.remainingCards.put(toPlay, this.remainingCards.get(toPlay) - 1);
         this.numChipsPresent += 1;
+        this.numMovesMade += 1;
 
         List<GamePosition> skips = new ArrayList<>();
         List<GamePosition> matches = this.matchingNeighbors(where);
@@ -171,6 +174,7 @@ public class SequenceModel implements PlayableSequenceModel {
       }
       if (!Objects.isNull(this.tracker)){
         this.tracker.increment(winner);
+        this.tracker.receiveNumMoves(this.numMovesMade);
       }
     }
   }
@@ -205,6 +209,7 @@ public class SequenceModel implements PlayableSequenceModel {
 
   @Override
   public void initializeGame(GameBoard gameBoard, List<SequenceController> players, Random shuffler) {
+    this.numMovesMade = 0;
     this.board = Objects.requireNonNull(gameBoard);
     this.shuffler = shuffler;
     Objects.requireNonNull(players);

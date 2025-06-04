@@ -22,4 +22,10 @@ public interface ScoreKeeper {
    * @return the string in format "Team x: [count x], Team y: [count y], Ties: [count t]"
    */
   String displayResults();
+
+  /**
+   * Receives a count of the number of moves in a completed game.
+   * @param numMoves the number of moves from the game that was completed
+   */
+  void receiveNumMoves(int numMoves);
 }

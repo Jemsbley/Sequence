@@ -8,6 +8,8 @@ public class TwoPlayerScoreKeeper implements ScoreKeeper{
   private int p2wins = 0;
   private int ties = 0;
 
+  private int totalMoves = 0;
+
   private GameChip p1 = GameChip.NONE;
   private GameChip p2 = GameChip.NONE;;
 
@@ -36,8 +38,14 @@ public class TwoPlayerScoreKeeper implements ScoreKeeper{
 
   @Override
   public String displayResults() {
-    return "Team " + p1.name() + ": " + p1wins + " , Team "
-            + p2.name() + ": " + p2wins + ", Ties: " + ties;
+    return "Team " + p1.name() + ": " + p1wins + ", Team "
+            + p2.name() + ": " + p2wins + ", Ties: " + ties + "\n"
+            + "Avg moves: " + ((double) this.totalMoves) / (this.p1wins + this.p2wins + this.ties);
+  }
+
+  @Override
+  public void receiveNumMoves(int numMoves) {
+    this.totalMoves += numMoves;
   }
 
 }
