@@ -95,6 +95,23 @@ public record GamePosition(int x, int y) {
   }
 
   /**
+   * Returns a new GamePosition that represents the unit vector corresponding to this vector.
+   * NOTE: This assumes that this GamePosition is square
+   * @return the unit vector for this GamePosition
+   */
+  public GamePosition normalize() {
+    int newx = 0;
+    int newy = 0;
+    if (this.x != 0) {
+      newx = this.x / Math.abs(this.x);
+    }
+    if (this.y != 0) {
+      newy = this.y / Math.abs(this.y);
+    }
+    return new GamePosition(newx, newy);
+  }
+
+  /**
    * Determines if this direction heads backwards in board space. This is important when
    * finding the header of a sequence
    * @return whether this direction heads backward

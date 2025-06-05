@@ -2,12 +2,14 @@ import java.util.List;
 import java.util.Random;
 
 import game.algorithms.AsRandomAsCanBe;
+import game.algorithms.CardCountingFOSNB;
 import game.algorithms.DefensiveNetworkBuilding;
 import game.algorithms.FarsightedAvoidantSavingNetworkBuilding;
 import game.algorithms.FarsightedDefensiveNetworkBuilding;
 import game.algorithms.FarsightedOffensiveNetworkBuilding;
 import game.algorithms.FarsightedOffensiveSavingNetworkBuilding;
 import game.algorithms.FarsightedScoredNetworkBuilding;
+import game.algorithms.FirstCardPriorityTopLeft;
 import game.algorithms.InverseNetworkBuilding;
 import game.algorithms.OffensiveNetworkBuilding;
 import game.algorithms.RandomNetworkBuilding;
@@ -53,12 +55,12 @@ public class MainExperiments {
       ScoreKeeper sk = new TwoPlayerScoreKeeper();
       sk.addPlayer(GameChip.BLUE);
       sk.addPlayer(GameChip.RED);
-      for (int reps = 0; reps < 2500; reps += 1) {
+      for (int reps = 0; reps < 1000; reps += 1) {
         model = new SequenceModel();
         def = new StandardBoardType();
-        blueCPU = new AlgorithmController(new TitForTatFOSNB(),
+        blueCPU = new AlgorithmController(new FirstCardPriorityTopLeft(),
                 model, GameChip.BLUE);
-        redCPU = new AlgorithmController(new FarsightedOffensiveSavingNetworkBuilding(),
+        redCPU = new AlgorithmController(new AsRandomAsCanBe(),
                 model, GameChip.RED);
         model.initializeGame(def, List.of(redCPU, blueCPU), new Random());
         blueCPU.addView(gf3);
@@ -77,7 +79,7 @@ public class MainExperiments {
     }
     else if (realplayers == 1) {
       SequenceController blueGuy = new HumanController(model, GameChip.BLUE);
-      SequenceController redCPU = new AlgorithmController(new TitForTatFOSNB(),
+      SequenceController redCPU = new AlgorithmController(new FarsightedOffensiveSavingNetworkBuilding(),
               model, GameChip.RED);
       model.initializeGame(def, List.of(blueGuy, redCPU), new Random());
       GameFrame gf = new GameFrame(model, blueGuy);
