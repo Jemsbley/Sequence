@@ -3,6 +3,7 @@ import java.util.Random;
 
 import game.algorithms.AsRandomAsCanBe;
 import game.algorithms.DefensiveNetworkBuilding;
+import game.algorithms.FarsightedAvoidantSavingNetworkBuilding;
 import game.algorithms.FarsightedDefensiveNetworkBuilding;
 import game.algorithms.FarsightedOffensiveNetworkBuilding;
 import game.algorithms.FarsightedOffensiveSavingNetworkBuilding;
@@ -11,6 +12,7 @@ import game.algorithms.InverseNetworkBuilding;
 import game.algorithms.OffensiveNetworkBuilding;
 import game.algorithms.RandomNetworkBuilding;
 import game.algorithms.ScoredNetworkBuilding;
+import game.algorithms.TitForTatFOSNB;
 import game.algorithms.TwoNeurons;
 import game.board.GameBoard;
 import game.board.StandardBoardType;
@@ -51,12 +53,12 @@ public class MainExperiments {
       ScoreKeeper sk = new TwoPlayerScoreKeeper();
       sk.addPlayer(GameChip.BLUE);
       sk.addPlayer(GameChip.RED);
-      for (int reps = 0; reps < 1000; reps += 1) {
+      for (int reps = 0; reps < 2500; reps += 1) {
         model = new SequenceModel();
         def = new StandardBoardType();
-        blueCPU = new AlgorithmController(new FarsightedScoredNetworkBuilding(),
+        blueCPU = new AlgorithmController(new TitForTatFOSNB(),
                 model, GameChip.BLUE);
-        redCPU = new AlgorithmController(new AsRandomAsCanBe(),
+        redCPU = new AlgorithmController(new FarsightedOffensiveSavingNetworkBuilding(),
                 model, GameChip.RED);
         model.initializeGame(def, List.of(redCPU, blueCPU), new Random());
         blueCPU.addView(gf3);
@@ -75,7 +77,7 @@ public class MainExperiments {
     }
     else if (realplayers == 1) {
       SequenceController blueGuy = new HumanController(model, GameChip.BLUE);
-      SequenceController redCPU = new AlgorithmController(new FarsightedOffensiveSavingNetworkBuilding(),
+      SequenceController redCPU = new AlgorithmController(new TitForTatFOSNB(),
               model, GameChip.RED);
       model.initializeGame(def, List.of(blueGuy, redCPU), new Random());
       GameFrame gf = new GameFrame(model, blueGuy);

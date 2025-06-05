@@ -2,6 +2,7 @@ package game.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import game.board.Card;
 import game.board.Cell;
@@ -23,15 +24,9 @@ public class OffensiveNetworkBuilding implements SequenceAlgorithm {
   public void beginTurn(PlayableSequenceModel model, SequenceController receiver) {
     GameBoard bd = model.getBoard();
     Cell[][] layout = bd.getBoard();
-    List<GamePosition> mine = new ArrayList<>();
-    for (int col = 0; col < layout.length; col += 1) {
-      for (int row = 0; row < layout[0].length; row += 1) {
-        if (layout[col][row].getChip().equals(receiver.getTeam()) ||
-                layout[col][row].getChip().equals(GameChip.ALL)) {
-          mine.add(new GamePosition(col, row));
-        }
-      }
-    }
+    Map<GameChip, List<GamePosition>> chips = model.getChips();
+
+    List<GamePosition> mine = chips.get(receiver.getTeam());
 
     while (true) {
       boolean deadCarded = false;
